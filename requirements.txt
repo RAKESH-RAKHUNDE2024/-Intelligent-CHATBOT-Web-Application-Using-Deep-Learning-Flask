@@ -2,4 +2,4 @@ Flask==3.0.0
 tensorflow==2.20.0
 numpy==1.26.4
 nltk==3.8.1
-gunicorn
+gunicorn==22.0.0
