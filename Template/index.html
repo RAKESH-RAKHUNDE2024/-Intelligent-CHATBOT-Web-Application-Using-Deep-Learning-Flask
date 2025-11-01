@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Chatbot</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jQuery CDN (local static file can be used instead) -->
+    <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+    <style>
+        /* Custom styles for chat container */
+        .chat-container {
+            max-height: 500px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+        /* User message style */
+        .user-message {
+            background-color: #3b82f6; /* Blue */
+            color: white;
+            border-radius: 10px 10px 0 10px;
+            margin-left: 20%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        /* Bot message style */
+        .bot-message {
+            background-color: #10b981; /* Green */
+            color: white;
+            border-radius: 10px 10px 10px 0;
+            margin-right: 20%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        /* Scrollbar styling */
+        .chat-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-container::-webkit-scrollbar-thumb {
+            background-color: #6b7280;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="w-full max-w-lg bg-white rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold text-center text-gray-800 mb-4">Job Chatbot</h1>
+        <!-- Chat history container -->
+        <div id="chatHistory" class="chat-container mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <!-- Messages will be appended here -->
+        </div>
+        <!-- Input form -->
+        <form id="chatForm" class="flex gap-2">
+            <input type="text" name="question" id="questionInput" placeholder="Ask about jobs..." required class="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Send</button>
+        </form>
+    </div>
+
+    <script>
+        // Function to add message to chat history
+        function addMessage(sender, message) {
+            const chatHistory = document.getElementById('chatHistory');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = sender === 'user' ? 'user-message' : 'bot-message';
+            messageDiv.innerHTML = `<strong>${sender === 'user' ? 'You' : 'Bot'}:</strong> ${message}`;
+            chatHistory.appendChild(messageDiv);
+            // Auto-scroll to the latest message
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        // Handle form submission
+        document.getElementById('chatForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const questionInput = document.getElementById('questionInput');
+            const question = questionInput.value.trim();
+            if (!question) return;
+
+            // Add user message to chat history
+            addMessage('user', question);
+
+            // Send request to server
+            fetch('/chatbot', {
+                method: 'POST',
+                body: new FormData(this)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Add bot response to chat history
+                addMessage('bot', data.response);
+                // Clear input
+                questionInput.value = '';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addMessage('bot', 'Sorry, something went wrong!');
+            });
+        });
+
+        // Optional: jQuery alternative for form submission (uncomment to use)
+        /*
+        $(document).ready(function() {
+            $('#chatForm').submit(function(e) {
+                e.preventDefault();
+                const question = $('#questionInput').val().trim();
+                if (!question) return;
+
+                // Add user message
+                addMessage('user', question);
+
+                // AJAX request with jQuery
+                $.post('/chatbot', { question: question }, function(data) {
+                    addMessage('bot', data.response);
+                    $('#questionInput').val('');
+                }).fail(function() {
+                    addMessage('bot', 'Sorry, something went wrong!');
+                });
+            });
+        });
+        */
+    </script>
+</body>
+</html>
