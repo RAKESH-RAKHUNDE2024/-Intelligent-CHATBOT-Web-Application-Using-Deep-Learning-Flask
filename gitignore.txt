@@ -1,0 +1,29 @@
+# Virtual environment
+chatbot_env/
+.env/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Model and data files
+chatbot_model.h5
+words.pkl
+classes.pkl
+job_intents.json
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Local IDE/Editor files
+.vscode/
+.idea/
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# macOS/Windows specific
+.DS_Store
+Thumbs.db
